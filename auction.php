@@ -16,6 +16,14 @@ if ($type_filter > 0) {
     $type_data = $stmt->fetch();
     $type_name = $type_data ? $type_data['name'] : '';
 }
+
+// Pagination and filter parameters
+$status_filter = isset($_GET['status']) ? $_GET['status'] : 'all'; // all, upcoming, active, ended
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$items_per_page = 12;
+
+// Calculate offset for pagination
+$offset = ($page - 1) * $items_per_page;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,7 +40,7 @@ if ($type_filter > 0) {
         .auction-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 30px 20px;
         }
 
         /* Type Header */
@@ -248,6 +256,74 @@ if ($type_filter > 0) {
             text-decoration: underline;
         }
 
+        .status-filters {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .status-filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .status-filter-btn:hover {
+            background: #f5f5f5;
+        }
+        
+        .status-filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .pagination a, .pagination span {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .pagination a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .pagination a:hover {
+            background: #f5f5f5;
+        }
+        
+        .pagination .active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .pagination .disabled {
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        .no-items {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
         /* Responsive Styles */
         @media (max-width: 768px) {
             .section-header {
@@ -411,19 +487,42 @@ if ($type_filter > 0) {
         <?php endif; ?>
         
         <div class="auction-container">
+            <!-- Status Filter Buttons -->
+            <div class="status-filters">
+                <a href="?<?= http_build_query(array_merge($_GET, ['status' => 'all', 'page' => 1])) ?>" 
+                   class="status-filter-btn <?= $status_filter === 'all' ? 'active' : '' ?>">
+                    All
+                </a>
+                <a href="?<?= http_build_query(array_merge($_GET, ['status' => 'upcoming', 'page' => 1])) ?>" 
+                   class="status-filter-btn <?= $status_filter === 'upcoming' ? 'active' : '' ?>">
+                    Upcoming
+                </a>
+                <a href="?<?= http_build_query(array_merge($_GET, ['status' => 'active', 'page' => 1])) ?>" 
+                   class="status-filter-btn <?= $status_filter === 'active' ? 'active' : '' ?>">
+                    Active
+                </a>
+                <a href="?<?= http_build_query(array_merge($_GET, ['status' => 'ended', 'page' => 1])) ?>" 
+                   class="status-filter-btn <?= $status_filter === 'ended' ? 'active' : '' ?>">
+                    Ended
+                </a>
+            </div>
+            
             <?php
             $now = new DateTime();
             $upcomingAuctions = [];
             $activeAuctions = [];
             $endedAuctions = [];
             
-            // Get all auctions and separate them
+            // Base query with type filter if set
             $query = "SELECT i.*, t.name as type_name, t.image as type_image FROM items i LEFT JOIN auction_types t ON i.type_id = t.id ";
+            $count_query = "SELECT COUNT(*) FROM items i ";
+            
             if ($type_filter > 0) {
                 $query .= "WHERE i.type_id = $type_filter ";
+                $count_query .= "WHERE i.type_id = $type_filter ";
             }
-            $query .= "ORDER BY i.bid_start_date ASC";
             
+            // Execute query to get all items for filtering
             $stmt = $pdo->query($query);
             while ($item = $stmt->fetch()) {
                 $start_date = new DateTime($item['bid_start_date']);
@@ -438,70 +537,80 @@ if ($type_filter > 0) {
                 }
             }
             
-            // Display upcoming auctions
-            if (!empty($upcomingAuctions)): ?>
-                <section class="upcoming-auctions">
-                    <div class="section-header">
-                        <h2>Upcoming Auctions</h2>
-                        <div class="time-info">
-                            <i class="fas fa-clock"></i> Current Time: <?= date('M j, Y H:i'); ?>
-                        </div>
-                    </div>
-                    
-                    <div class="auction-grid">
-                        <?php
-                        $upcomingChunks = array_chunk($upcomingAuctions, 4);
-                        foreach ($upcomingChunks as $chunk): ?>
-                            <div class="auction-row">
-                                <?php foreach ($chunk as $item) {
-                                    displayAuctionItem($item, 'upcoming', $is_admin_view);
-                                } ?>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </section>
-            <?php endif; ?>
+            // Filter items based on status filter
+            $filteredAuctions = [];
+            if ($status_filter === 'upcoming') {
+                $filteredAuctions = $upcomingAuctions;
+            } elseif ($status_filter === 'active') {
+                $filteredAuctions = $activeAuctions;
+            } elseif ($status_filter === 'ended') {
+                $filteredAuctions = $endedAuctions;
+            } else {
+                $filteredAuctions = array_merge($upcomingAuctions, $activeAuctions, $endedAuctions);
+            }
             
-            <!-- Active Auctions Section -->
-            <section class="active-auctions">
-                <div class="section-header">
-                    <h2>Active Auctions</h2>
-                    <div class="time-info">
-                        <i class="fas fa-clock"></i> Current Time: <?= date('M j, Y H:i'); ?>
-                    </div>
-                </div>
-                
+            // Apply pagination
+            $total_items = count($filteredAuctions);
+            $total_pages = ceil($total_items / $items_per_page);
+            $paginatedAuctions = array_slice($filteredAuctions, $offset, $items_per_page);
+            
+            if (!empty($paginatedAuctions)): ?>
                 <div class="auction-grid">
                     <?php
-                    $activeChunks = array_chunk($activeAuctions, 4);
-                    foreach ($activeChunks as $chunk): ?>
+                    $chunks = array_chunk($paginatedAuctions, 4);
+                    foreach ($chunks as $chunk): ?>
                         <div class="auction-row">
                             <?php foreach ($chunk as $item) {
-                                displayAuctionItem($item, 'active', $is_admin_view);
+                                displayAuctionItem($item, $is_admin_view);
                             } ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
-            </section>
-
-            <?php if (!empty($endedAuctions)): ?>
-            <section class="ended-auctions">
-                <div class="section-header">
-                    <h2>Ended Auctions</h2>
-                </div>
                 
-                <div class="auction-grid">
-                    <?php
-                    $endedChunks = array_chunk($endedAuctions, 4);
-                    foreach ($endedChunks as $chunk): ?>
-                        <div class="auction-row">
-                            <?php foreach ($chunk as $item) {
-                                displayAuctionItem($item, 'ended', $is_admin_view);
-                            } ?>
-                        </div>
-                    <?php endforeach; ?>
+                <!-- Pagination -->
+                <div class="pagination">
+                    <?php if ($page > 1): ?>
+                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>">&laquo; Previous</a>
+                    <?php else: ?>
+                        <span class="disabled">&laquo; Previous</span>
+                    <?php endif; ?>
+                    
+                    <?php 
+                    // Show page numbers
+                    $start_page = max(1, $page - 2);
+                    $end_page = min($total_pages, $page + 2);
+                    
+                    if ($start_page > 1) {
+                        echo '<a href="?' . http_build_query(array_merge($_GET, ['page' => 1])) . '">1</a>';
+                        if ($start_page > 2) {
+                            echo '<span>...</span>';
+                        }
+                    }
+                    
+                    for ($i = $start_page; $i <= $end_page; $i++): ?>
+                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>" <?= $i == $page ? 'class="active"' : '' ?>>
+                            <?= $i ?>
+                        </a>
+                    <?php endfor; 
+                    
+                    if ($end_page < $total_pages) {
+                        if ($end_page < $total_pages - 1) {
+                            echo '<span>...</span>';
+                        }
+                        echo '<a href="?' . http_build_query(array_merge($_GET, ['page' => $total_pages])) . '">' . $total_pages . '</a>';
+                    }
+                    ?>
+                    
+                    <?php if ($page < $total_pages): ?>
+                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page + 1])) ?>">Next &raquo;</a>
+                    <?php else: ?>
+                        <span class="disabled">Next &raquo;</span>
+                    <?php endif; ?>
                 </div>
-            </section>
+            <?php else: ?>
+                <div class="no-items">
+                    No auctions found in this category.
+                </div>
             <?php endif; ?>
         </div>
     </main>
@@ -520,8 +629,8 @@ if ($type_filter > 0) {
 </html>
 
 <?php
-// Helper function to display auction items
-function displayAuctionItem($item, $status, $isAdminView) {
+// Updated helper function to display auction items
+function displayAuctionItem($item, $isAdminView) {
     global $pdo;
     
     // Get highest bid for this item
@@ -538,14 +647,15 @@ function displayAuctionItem($item, $status, $isAdminView) {
     $start_date = new DateTime($item['bid_start_date']);
     $end_date = new DateTime($item['bid_end_date']);
     
-    if ($status === 'upcoming') {
-        $timeInfo = $now->diff($start_date);
-        $timeRemaining = $timeInfo->format('%a days %h hours %i minutes');
-    } elseif ($status === 'active') {
-        $timeInfo = $now->diff($end_date);
-        $timeRemaining = $timeInfo->format('%a days %h hours %i minutes');
+    if ($end_date <= $now) {
+        $status = 'ended';
+        $status_class = 'status-ended';
+    } elseif ($start_date > $now) {
+        $status = 'upcoming';
+        $status_class = 'status-upcoming';
     } else {
-        $timeRemaining = 'Ended';
+        $status = 'active';
+        $status_class = 'status-active';
     }
     
     echo '<div class="auction-card ' . $status . '" id="item-' . $item['id'] . '">';
@@ -574,12 +684,12 @@ function displayAuctionItem($item, $status, $isAdminView) {
             
     if ($status === 'upcoming') {
         echo '<div class="time-upcoming">
-                <i class="fas fa-clock"></i> Starts in ' . $timeRemaining . '
+                <i class="fas fa-clock"></i> Starts in ' . $now->diff($start_date)->format('%a days %h hours %i minutes') . '
               </div>';
         echo '<div class="alert alert-info">Bidding not yet started</div>';
     } elseif ($status === 'active' && !$isAdminView && isset($_SESSION['user_id'])) {
         echo '<div class="time-remaining">
-                <i class="fas fa-clock"></i> ' . $timeRemaining . ' left
+                <i class="fas fa-clock"></i> ' . $now->diff($end_date)->format('%a days %h hours %i minutes') . ' left
               </div>';
         echo '<a href="product_view.php?id=' . $item['id'] . '" class="btn btn-outline">Place Bid</a>';
     } else {

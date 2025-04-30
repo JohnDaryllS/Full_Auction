@@ -189,8 +189,31 @@ $currentDateTime = date('Y-m-d\TH:i');
             margin-top: 1.5rem;
         }
 
-         /* New styles for type cards */
-         .types-grid {
+        /* Search Form Styles */
+        .search-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-form .form-group {
+            display: flex;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .search-form select {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* New styles for type cards */
+        .types-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
@@ -438,9 +461,43 @@ $currentDateTime = date('Y-m-d\TH:i');
         <section class="tab-content <?= ($_GET['tab'] ?? '') === 'items' ? 'active' : '' ?>" id="items-tab">
             <div class="admin-section-header">
                 <h2>Coffee Auctions</h2>
-                <button id="add-item-btn" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Add New Item
-                </button>
+                <div class="admin-actions">
+                    <button id="add-item-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add New Item
+                    </button>
+                    <button id="search-items-btn" class="btn btn-outline">
+                        <i class="fas fa-search"></i> Search Items
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Search form for items by type -->
+            <div id="search-items-form" style="display: <?= isset($_GET['search_type']) ? 'block' : 'none' ?>; margin-top: 1rem;">
+                <form method="get" action="admin.php" class="search-form">
+                    <input type="hidden" name="tab" value="items">
+                    <div class="form-group">
+                        <select name="search_type" class="form-control">
+                            <option value="">-- All Types --</option>
+                            <?php
+                            $types = $pdo->query("SELECT * FROM auction_types ORDER BY name ASC");
+                            while ($type = $types->fetch()):
+                                $selected = isset($_GET['search_type']) && $_GET['search_type'] == $type['id'] ? 'selected' : '';
+                            ?>
+                                <option value="<?= $type['id'] ?>" <?= $selected ?>>
+                                    <?= htmlspecialchars($type['name']) ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                        <?php if (!empty($_GET['search_type'])): ?>
+                            <a href="admin.php?tab=items" class="btn btn-outline">
+                                <i class="fas fa-times"></i> Clear
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </form>
             </div>
             
             <!-- Add/Edit Form Container -->
@@ -540,7 +597,20 @@ $currentDateTime = date('Y-m-d\TH:i');
                     </thead>
                     <tbody>
                         <?php
-                        $stmt = $pdo->query("SELECT i.*, t.name as type_name, t.image as type_image FROM items i LEFT JOIN auction_types t ON i.type_id = t.id ORDER BY i.bid_start_date ASC");
+                        // Get type filter if set
+                        $type_filter = isset($_GET['search_type']) ? (int)$_GET['search_type'] : 0;
+
+                        // Base query
+                        $query = "SELECT i.*, t.name as type_name, t.image as type_image FROM items i LEFT JOIN auction_types t ON i.type_id = t.id ";
+
+                        // Add type filter if selected
+                        if ($type_filter > 0) {
+                            $query .= "WHERE i.type_id = $type_filter ";
+                        }
+
+                        $query .= "ORDER BY i.bid_start_date ASC";
+
+                        $stmt = $pdo->query($query);
                         while ($item = $stmt->fetch()): 
                             $now = new DateTime();
                             $start_date = new DateTime($item['bid_start_date']);
@@ -807,6 +877,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // User search toggle
     document.getElementById('search-users-btn').addEventListener('click', function() {
         const form = document.getElementById('search-users-form');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Item search toggle
+    document.getElementById('search-items-btn').addEventListener('click', function() {
+        const form = document.getElementById('search-items-form');
         form.style.display = form.style.display === 'none' ? 'block' : 'none';
     });
 

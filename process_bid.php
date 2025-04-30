@@ -3,7 +3,7 @@ session_start();
 include 'db_connect.php';
 
 // Check if user is logged in (and not admin)
-if (!isset($_SESSION['user_id']) {
+if (!isset($_SESSION['user_id']) || isset($_SESSION['admin_logged_in'])) {
     $_SESSION['error'] = 'You must be logged in to place bids';
     header('Location: login.php');
     exit;
