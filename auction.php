@@ -381,9 +381,10 @@ $offset = ($page - 1) * $items_per_page;
             </div>
         </div>
         <div class="navbar-center">
-            <a href="index.php" class="nav-link">Home</a>
-            <a href="auction.php" class="nav-link active">Auction</a>
-            <a href="about.php" class="nav-link">About</a>
+            <a href="index.php" class="nav-link <?= $is_home ? 'active' : '' ?>">Home</a>
+            <a href="auction.php" class="nav-link <?= $current_page == 'auction.php' ? 'active' : '' ?>">Auction</a>
+            <a href="reviews.php" class="nav-link <?= $current_page == 'reviews.php' ? 'active' : '' ?>">Reviews</a>
+            <a href="about.php" class="nav-link <?= $current_page == 'about.php' ? 'active' : '' ?>">About</a>
         </div>
         <div class="navbar-right">
             <?php if (isset($_SESSION['user_id'])): ?>

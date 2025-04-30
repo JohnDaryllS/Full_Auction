@@ -21,6 +21,7 @@
         <div class="navbar-center">
             <a href="index.php" class="nav-link">Home</a>
             <a href="auction.php" class="nav-link">Auction</a>
+            <a href="reviews.php" class="nav-link <?= $current_page == 'reviews.php' ? 'active' : '' ?>">Reviews</a>
             <a href="about.php" class="nav-link">About</a>
         </div>
         <div class="navbar-right">

@@ -23,170 +23,187 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coffee Auction - Premium Coffee Beans</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" href="images/crop.png" type="image/x-icon">
+    <link rel="shortcut icon" href="images/faviconsss.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 80vh;
+            overflow: hidden;
+            color: white;
+            display: flex;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero-content {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .highest-bid-banner {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem auto;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .bid-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .bid-info .label {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: brown;
+        }
+
+        .bid-info .amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f8c537;
+        }
+
+        .item-info {
+            font-style: italic;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .auction-types {
+            margin: 4rem 0;
+        }
+
+        .types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .type-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: block;
+            color: inherit;
+        }
+
+        .type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            text-decoration: none;
+        }
+
+        .type-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .type-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .type-card:hover .type-image img {
+            transform: scale(1.05);
+        }
+
+        .type-info {
+            padding: 1.5rem;
+        }
+
+        .type-info h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .type-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .rating {
+            color: #ffc107;
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .rating i {
+            margin-right: 2px;
+        }
+
+        .rating span {
+            color: #666;
+            margin-left: 5px;
+            font-size: 0.8rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
+            .bid-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .bid-info .amount {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
 </head>
-<style>
-    /* Hero Section */
-.hero {
-    position: relative;
-    height: 80vh;
-    overflow: hidden;
-    color: white;
-    display: flex;
-    align-items: center;
-    text-align: center;
-}
-
-.hero-content {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    position: relative;
-    z-index: 2;
-}
-
-.hero h1 {
-    font-size: 3.5rem;
-    margin-bottom: 1.5rem;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-}
-
-.hero p {
-    font-size: 1.5rem;
-    margin-bottom: 2.5rem;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-.highest-bid-banner {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin: 2rem auto;
-    max-width: 500px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.bid-info {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-}
-
-.bid-info .label {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: brown;
-}
-
-.bid-info .amount {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #f8c537;
-}
-
-.item-info {
-    font-style: italic;
-    font-size: 0.9rem;
-    opacity: 0.9;
-}
-
-.auction-types {
-    margin: 4rem 0;
-}
-
-.types-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-.type-card {
-    background-color: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: block;
-    color: inherit;
-}
-
-.type-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    text-decoration: none;
-}
-
-.type-image {
-    height: 200px;
-    overflow: hidden;
-}
-
-.type-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.type-card:hover .type-image img {
-    transform: scale(1.05);
-}
-
-.type-info {
-    padding: 1.5rem;
-}
-
-.type-info h3 {
-    margin-bottom: 0.5rem;
-    color: var(--primary-color);
-}
-
-.type-info p {
-    color: #666;
-    font-size: 0.9rem;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-    .hero h1 {
-        font-size: 2.5rem;
-    }
-    
-    .hero p {
-        font-size: 1.2rem;
-    }
-    
-    .bid-info {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    
-    .bid-info .amount {
-        font-size: 1.8rem;
-    }
-}
-</style>
 <body>
     <nav class="navbar">
         <div class="navbar-left">
             <div class="logo">
-                <img src="images/crop.png" alt="Coffee-Auction" style="width:50px;">
-                <span class="logo-text">Coffee Auction</span>
+                <img src="images/faviconsss.png" alt="Coffee-Auction" style="width:50px;">
+                <span class="logo-text"> Auctions</span>
             </div>
         </div>
         <div class="navbar-center">
             <a href="index.php" class="nav-link <?= $is_home ? 'active' : '' ?>">Home</a>
             <a href="auction.php" class="nav-link <?= $current_page == 'auction.php' ? 'active' : '' ?>">Auction</a>
+            <a href="reviews.php" class="nav-link <?= $current_page == 'reviews.php' ? 'active' : '' ?>">Reviews</a>
             <a href="about.php" class="nav-link <?= $current_page == 'about.php' ? 'active' : '' ?>">About</a>
         </div>
         <div class="navbar-right">
@@ -275,8 +292,16 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
             </div>
             <div class="types-grid">
                 <?php
-                $stmt = $pdo->query("SELECT * FROM auction_types ORDER BY name ASC");
-                while ($type = $stmt->fetch()):
+                $types = $pdo->query("
+                    SELECT t.*, 
+                           AVG(r.rating) as avg_rating,
+                           COUNT(r.id) as review_count
+                    FROM auction_types t
+                    LEFT JOIN reviews r ON t.id = r.category_id
+                    GROUP BY t.id
+                    ORDER BY name ASC
+                ");
+                while ($type = $types->fetch()):
                 ?>
                     <a href="auction.php?type=<?= $type['id'] ?>" class="type-card">
                         <div class="type-image">
@@ -285,15 +310,23 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
                         <div class="type-info">
                             <h3><?= htmlspecialchars($type['name']) ?></h3>
                             <p><?= htmlspecialchars($type['description']) ?></p>
+                            <div class="rating">
+                                <?php if ($type['review_count'] > 0): ?>
+                                    <?php 
+                                    $avg_rating = round($type['avg_rating']);
+                                    for ($i = 1; $i <= 5; $i++): ?>
+                                        <i class="fas fa-star<?= $i > $avg_rating ? '-half-alt' : '' ?>"></i>
+                                    <?php endfor; ?>
+                                    <span>(<?= number_format($type['avg_rating'], 1) ?>/5 from <?= $type['review_count'] ?> reviews)</span>
+                                <?php else: ?>
+                                    <span>No reviews yet</span>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </a>
                 <?php endwhile; ?>
             </div>
         </section>
     </main>
-
-    <footer class="modern-footer">
-        <!-- Footer content remains the same -->
-    </footer>
 </body>
 </html>
