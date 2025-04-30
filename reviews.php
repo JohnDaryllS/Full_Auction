@@ -105,7 +105,7 @@ $reviews = $pdo->query("
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reviews - Coffee Auction</title>
+    <title>Reviews - TagHammer Auctions</title>
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="images/crop.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -294,9 +294,9 @@ $reviews = $pdo->query("
 
 <nav class="navbar">
         <div class="navbar-left">
-            <div class="logo">
-                <img src="images/crop.png" alt="Coffee-Auction" style="width:50px;">
-                <span class="logo-text">Coffee Auction</span>
+           <div class="logo">
+                <img src="images/faviconsss.png" alt="Coffee-Auction" style="width:50px;">
+                <span class="logo-text"> TagHammer Auctions</span>
             </div>
         </div>
         <div class="navbar-center">

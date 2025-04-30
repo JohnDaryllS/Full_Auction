@@ -21,7 +21,7 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coffee Auction - Premium Coffee Beans</title>
+    <title>TagHammer Auctions</title>
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="images/faviconsss.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -197,7 +197,7 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
         <div class="navbar-left">
             <div class="logo">
                 <img src="images/faviconsss.png" alt="Coffee-Auction" style="width:50px;">
-                <span class="logo-text"> Auctions</span>
+                <span class="logo-text"> TagHammer Auctions</span>
             </div>
         </div>
         <div class="navbar-center">
