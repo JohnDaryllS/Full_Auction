@@ -29,6 +29,9 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
     <style>
         /* Hero Section */
         .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/432.png');
+            background-size: cover;
+            background-position: center;
             position: relative;
             height: 80vh;
             overflow: hidden;
@@ -230,6 +233,151 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
             font-size: 1rem;
         }
 
+        /* Legal Modal Styles */
+        .legal-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .legal-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .legal-modal {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(-50px);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .legal-modal-overlay.active .legal-modal {
+            transform: translateY(0);
+        }
+        
+        .legal-modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .legal-modal-header h2 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+        
+        .close-modal:hover {
+            color: #333;
+        }
+        
+        .legal-modal-content {
+            padding: 20px;
+        }
+        
+        .legal-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .legal-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .legal-tab.active {
+            border-bottom-color: var(--primary-color);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .legal-tab-content {
+            display: none;
+        }
+        
+        .legal-tab-content.active {
+            display: block;
+        }
+        
+        .legal-modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            position: sticky;
+            bottom: 0;
+            background: white;
+        }
+        
+        .policy-content {
+            max-height: 50vh;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .policy-content h3 {
+            margin-top: 25px;
+            color: var(--primary-color);
+        }
+        
+        .policy-content h4 {
+            margin-top: 20px;
+        }
+        
+        .btn-accept {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .btn-deny {
+            background-color: #f5f5f5;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
         /* Responsive Styles */
         @media (max-width: 768px) {
             .hero h1 {
@@ -264,6 +412,7 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
             <a href="auction.php" class="nav-link <?= $current_page == 'auction.php' ? 'active' : '' ?>">Auction</a>
             <a href="reviews.php" class="nav-link <?= $current_page == 'reviews.php' ? 'active' : '' ?>">Reviews</a>
             <a href="about.php" class="nav-link <?= $current_page == 'about.php' ? 'active' : '' ?>">About</a>
+            <a href="faqs.php" class="nav-link <?= $current_page == 'faqs.php' ? 'active' : '' ?>">FAQ</a>
         </div>
         <div class="navbar-right">
             <?php if (isset($_SESSION['user_id'])): ?>
@@ -325,21 +474,8 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
 
     <header class="hero">
         <div class="hero-content">
-            <h1>Discover Rare & Premium Coffee Beans</h1>
-            <p>Bid on the world's finest coffee selections from small farms and specialty growers</p>
-
-            <?php if ($highestBidItem): ?>
-                <div class="highest-bid-banner">
-                    <div class="bid-info">
-                        <span class="label">Highest Current Bid:</span>
-                        <span class="amount">₱<?= number_format($highestBid, 2) ?></span>
-                    </div>
-                    <div class="item-info">
-                        For "<?= htmlspecialchars($highestBidItem['name']) ?>"
-                    </div>
-                </div>
-            <?php endif; ?>
-
+            <h1>Where Bidders Compete. You Win.</h1>
+            <p>From Rare Collectibles to Everyday Deals, Our All-in-One Auction Platform Lets You Explore, Compete, and Win No Matter Where You Are.</p>
             <a href="auction.php" class="btn btn-primary btn-large">View Auctions</a>
         </div>
     </header>
@@ -427,7 +563,7 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
                     <img src="images/faviconsss.png" alt="Coffee Auction Logo" style="width:50px;">
                     <span class="logo-text">TagHammer Auctions</span>
                 </div>
-                <p class="footer-tagline">Discover the world's finest coffee beans through exclusive auctions</p>
+                <p class="footer-tagline">From Rare Collectibles to Everyday Deals, Our All-in-One Auction Platform Lets You Explore, Compete, and Win No Matter Where You Are.</p>
                 <div class="newsletter">
                     <h4>Stay Updated</h4>
                     <form class="newsletter-form">
@@ -445,8 +581,8 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
                         <li><a href="index.php">Home</a></li>
                         <li><a href="auction.php">Auctions</a></li>
                         <li><a href="about.php">About Us</a></li>
-                        <li><a href="contact.php">Contact Us</a></li>
-                        <li><a href="faq.php">FAQ</a></li>
+                        <li><a href="reviews.php">Reviews</a></li>
+                        <li><a href="faqs.php">FAQ</a></li>
                     </ul>
                 </div>
                 <div class="links-column">
@@ -461,9 +597,9 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
                 <div class="links-column">
                     <h4>Contact</h4>
                     <ul class="contact-info">
-                        <li><i class="fas fa-envelope"></i> info@coffeeauction.com</li>
-                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
-                        <li><i class="fas fa-map-marker-alt"></i> 123 Coffee Lane, Portland, OR 97204</li>
+                        <li><i class="fas fa-envelope"></i> admin@coffeeauction.com</li>
+                        <li><i class="fas fa-phone"></i> (082)224-1002 | (082) 333-6712</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 2F, Molave Street corner Calamansi Street Juna Subdivision, Matina, Davao City</li>
                     </ul>
                 </div>
             </div>
@@ -492,6 +628,99 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
         </div>
     </div>
 </footer>
+
+<div class="legal-modal-overlay" id="legalModal">
+        <div class="legal-modal">
+            <div class="legal-modal-header">
+                <h2>Terms and Policies</h2>
+                <button class="close-modal" id="closeModalBtn">&times;</button>
+            </div>
+            
+            <div class="legal-tabs">
+                <div class="legal-tab active" data-tab="terms">Terms of Service</div>
+                <div class="legal-tab" data-tab="privacy">Privacy Policy</div>
+                <div class="legal-tab" data-tab="refund">Refund Policy</div>
+                <div class="legal-tab" data-tab="bidding">Bidding Rules</div>
+            </div>
+            
+            <div class="legal-modal-content">
+                <!-- Terms of Service -->
+                <div class="legal-tab-content active" id="terms-content">
+                    <div class="policy-content">
+                        <h3>Terms of Service</h3>
+                        <p>Last Updated: January 1, 2025</p>
+                        
+                        <h4>1. Acceptance of Terms</h4>
+                        <p>By accessing or using TagHammer Auctions ("the Platform"), you agree to be bound by these Terms of Service and all applicable laws and regulations.</p>
+                        
+                        <h4>2. User Accounts</h4>
+                        <p>You must be at least 18 years old to create an account. You are responsible for maintaining the confidentiality of your account credentials.</p>
+                        
+                        <h4>3. Prohibited Conduct</h4>
+                        <p>Users may not:
+                            <ul>
+                                <li>Engage in fraudulent activities</li>
+                                <li>List prohibited items</li>
+                                <li>Circumvent auction fees</li>
+                                <li>Interfere with other users' transactions</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Privacy Policy -->
+                <div class="legal-tab-content" id="privacy-content">
+                    <div class="policy-content">
+                        <h3>Privacy Policy</h3>
+                        <p>Last Updated: January 1, 2025</p>
+                        
+                        <h4>1. Information We Collect</h4>
+                        <p>We collect personal information including:
+                            <ul>
+                                <li>Contact details (name, email, phone)</li>
+                                <li>Payment information</li>
+                                <li>Browsing and bidding activity</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Refund Policy -->
+                <div class="legal-tab-content" id="refund-content">
+                    <div class="policy-content">
+                        <h3>Refund Policy</h3>
+                        <p>Last Updated: January 1, 2025</p>
+                        
+                        <h4>1. Buyer Protection</h4>
+                        <p>We offer refunds in cases where:
+                            <ul>
+                                <li>Item is significantly not as described</li>
+                                <li>Item is damaged during shipping</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Bidding Rules -->
+                <div class="legal-tab-content" id="bidding-content">
+                    <div class="policy-content">
+                        <h3>Bidding Rules</h3>
+                        <p>Last Updated: January 1, 2025</p>
+                        
+                        <h4>1. Binding Bids</h4>
+                        <p>All bids are binding contracts. By placing a bid, you agree to purchase the item if you win.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="legal-modal-footer">
+                <button class="btn btn-deny" id="denyBtn">Deny</button>
+                <button class="btn btn-accept" id="acceptBtn">I Accept</button>
+            </div>
+        </div>
+    </div>
+
+<script src="js/terms.js"></script>
 
 </body>
 </html>

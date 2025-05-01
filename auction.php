@@ -385,6 +385,7 @@ $offset = ($page - 1) * $items_per_page;
             <a href="auction.php" class="nav-link <?= $current_page == 'auction.php' ? 'active' : '' ?>">Auction</a>
             <a href="reviews.php" class="nav-link <?= $current_page == 'reviews.php' ? 'active' : '' ?>">Reviews</a>
             <a href="about.php" class="nav-link <?= $current_page == 'about.php' ? 'active' : '' ?>">About</a>
+            <a href="faqs.php" class="nav-link <?= $current_page == 'faqs.php' ? 'active' : '' ?>">FAQ</a>
         </div>
         <div class="navbar-right">
             <?php if (isset($_SESSION['user_id'])): ?>
@@ -626,7 +627,7 @@ $offset = ($page - 1) * $items_per_page;
                         <img src="images/faviconsss.png" alt="Coffee Auction Logo" style="width:50px;">
                         <span class="logo-text">TagHammer Auctions</span>
                     </div>
-                    <p class="footer-tagline">Discover the world's finest coffee beans through exclusive auctions</p>
+                    <p class="footer-tagline">From Rare Collectibles to Everyday Deals, Our All-in-One Auction Platform Lets You Explore, Compete, and Win No Matter Where You Are.</p>
                     <div class="newsletter">
                         <h4>Stay Updated</h4>
                         <form class="newsletter-form">
@@ -644,8 +645,8 @@ $offset = ($page - 1) * $items_per_page;
                             <li><a href="index.php">Home</a></li>
                             <li><a href="auction.php">Auctions</a></li>
                             <li><a href="about.php">About Us</a></li>
-                            <li><a href="contact.php">Contact Us</a></li>
-                            <li><a href="faq.php">FAQ</a></li>
+                            <li><a href="reviews.php">Reviews</a></li>
+                            <li><a href="faqs.php">FAQ</a></li>
                         </ul>
                     </div>
                     <div class="links-column">
@@ -660,9 +661,9 @@ $offset = ($page - 1) * $items_per_page;
                     <div class="links-column">
                         <h4>Contact</h4>
                         <ul class="contact-info">
-                            <li><i class="fas fa-envelope"></i> info@coffeeauction.com</li>
-                            <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
-                            <li><i class="fas fa-map-marker-alt"></i> 123 Coffee Lane, Portland, OR 97204</li>
+                            <li><i class="fas fa-envelope"></i> admin@coffeeauction.com</li>
+                            <li><i class="fas fa-phone"></i> (082)224-1002 | (082) 333-6712</li>
+                            <li><i class="fas fa-map-marker-alt"></i> 2F, Molave Street corner Calamansi Street Juna Subdivision, Matina, Davao City</li>
                         </ul>
                     </div>
                 </div>

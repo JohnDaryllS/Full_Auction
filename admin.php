@@ -335,6 +335,65 @@ $currentDateTime = date('Y-m-d\TH:i');
             font-weight: bold;
             cursor: pointer;
         }
+
+        /* Analytics Tab Styles */
+        .analytics-filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .analytics-filters .form-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .analytics-filters label {
+            font-weight: 500;
+        }
+        
+        .analytics-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .summary-card h3 {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .analytics-table {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
         
         /* Responsive Adjustments */
         @media (max-width: 768px) {
@@ -351,6 +410,19 @@ $currentDateTime = date('Y-m-d\TH:i');
             .btn {
                 width: 100%;
                 padding: 8px;
+            }
+
+            .analytics-filters .form-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .summary-card {
+                padding: 1rem;
+            }
+            
+            .summary-value {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -389,6 +461,7 @@ $currentDateTime = date('Y-m-d\TH:i');
             <button class="tab-btn <?= ($_GET['tab'] ?? '') === 'reviews' ? 'active' : '' ?>" data-tab="reviews">Reviews Management</button>
             <button class="tab-btn <?= ($_GET['tab'] ?? '') === 'winners' ? 'active' : '' ?>" data-tab="winners">Auction Winners</button>
             <button class="tab-btn <?= ($_GET['tab'] ?? '') === 'contacts' ? 'active' : '' ?>" data-tab="contacts">User Messages</button>
+            <button class="tab-btn <?= ($_GET['tab'] ?? '') === 'analytics' ? 'active' : '' ?>" data-tab="analytics">Analytics</button>
         </div>
         
         <section class="tab-content <?= ($_GET['tab'] ?? 'users') === 'users' ? 'active' : '' ?>" id="users-tab">
@@ -518,7 +591,7 @@ $currentDateTime = date('Y-m-d\TH:i');
         
         <section class="tab-content <?= ($_GET['tab'] ?? '') === 'items' ? 'active' : '' ?>" id="items-tab">
             <div class="admin-section-header">
-                <h2>Coffee Auctions</h2>
+                <h2>Auctions Items</h2>
                 <div class="admin-actions">
                     <button id="add-item-btn" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Add New Item
@@ -561,7 +634,7 @@ $currentDateTime = date('Y-m-d\TH:i');
             <!-- Add/Edit Form Container -->
             <div id="item-form-container" style="display: none;">
                 <div class="form-card">
-                    <h3 id="form-title">Add New Coffee Auction</h3>
+                    <h3 id="form-title">Add New Auction</h3>
                     <form id="item-form" action="process_item.php" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="action" id="form-action" value="add">
                         <input type="hidden" name="item_id" id="form-item-id" value="">
@@ -1078,6 +1151,94 @@ $currentDateTime = date('Y-m-d\TH:i');
                                 </td>
                             </tr>
                         <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="tab-content <?= ($_GET['tab'] ?? '') === 'analytics' ? 'active' : '' ?>" id="analytics-tab">
+            <h2>Auctions Analytics</h2>
+            
+            <div class="analytics-filters">
+                <form method="get" action="admin.php">
+                    <input type="hidden" name="tab" value="analytics">
+                    <div class="form-group">
+                        <label for="date-filter">Filter by Date:</label>
+                        <input type="date" id="date-filter" name="date" value="<?= $_GET['date'] ?? date('Y-m-d') ?>">
+                        <button type="submit" class="btn btn-primary">Apply</button>
+                    </div>
+                </form>
+            </div>
+            
+            <?php
+            // Get selected date or use today
+            $selected_date = $_GET['date'] ?? date('Y-m-d');
+            
+            // Query to get today's winning auctions
+            $winning_auctions = $pdo->prepare("
+                SELECT i.id, i.name, i.starting_price, MAX(b.bid_amount) as winning_bid, 
+                    u.fullname as winner_name, u.email as winner_email
+                FROM items i
+                JOIN bids b ON i.id = b.item_id
+                JOIN users u ON b.user_id = u.id
+                WHERE DATE(i.bid_end_date) = ?
+                GROUP BY i.id
+                ORDER BY winning_bid DESC
+            ");
+            $winning_auctions->execute([$selected_date]);
+            $auctions = $winning_auctions->fetchAll();
+            
+            // Calculate totals
+            $total_auctions = count($auctions);
+            $total_revenue = array_sum(array_column($auctions, 'winning_bid'));
+            ?>
+            
+            <div class="analytics-summary">
+                <div class="summary-card">
+                    <h3>Total Winning Auctions</h3>
+                    <div class="summary-value"><?= $total_auctions ?></div>
+                </div>
+                <div class="summary-card">
+                    <h3>Total Revenue</h3>
+                    <div class="summary-value">₱<?= number_format($total_revenue, 2) ?></div>
+                </div>
+                <div class="summary-card">
+                    <h3>Average Winning Bid</h3>
+                    <div class="summary-value">₱<?= $total_auctions > 0 ? number_format($total_revenue/$total_auctions, 2) : '0.00' ?></div>
+                </div>
+            </div>
+            
+            <div class="analytics-table">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Auction ID</th>
+                            <th>Item Name</th>
+                            <th>Starting Price</th>
+                            <th>Winning Bid</th>
+                            <th>Winner</th>
+                            <th>Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($auctions as $auction): ?>
+                            <tr>
+                                <td><?= $auction['id'] ?></td>
+                                <td><?= htmlspecialchars($auction['name']) ?></td>
+                                <td>₱<?= number_format($auction['starting_price'], 2) ?></td>
+                                <td>₱<?= number_format($auction['winning_bid'], 2) ?></td>
+                                <td>
+                                    <?= htmlspecialchars($auction['winner_name']) ?><br>
+                                    <small><?= htmlspecialchars($auction['winner_email']) ?></small>
+                                </td>
+                                <td>₱<?= number_format($auction['winning_bid'] - $auction['starting_price'], 2) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        <?php if (empty($auctions)): ?>
+                            <tr>
+                                <td colspan="6" class="no-data">No winning auctions found for this date</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

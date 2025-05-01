@@ -371,9 +371,11 @@ $bidHistory = $historyStmt->fetchAll();
     </div>
     <?php if (!$is_admin_view): ?>
         <div class="navbar-center">
-            <a href="index.php" class="nav-link">Home</a>
-            <a href="auction.php" class="nav-link">Auction</a>
-            <a href="about.php" class="nav-link">About</a>
+        <a href="index.php" class="nav-link <?= $is_home ? 'active' : '' ?>">Home</a>
+            <a href="auction.php" class="nav-link <?= $current_page == 'auction.php' ? 'active' : '' ?>">Auction</a>
+            <a href="reviews.php" class="nav-link <?= $current_page == 'reviews.php' ? 'active' : '' ?>">Reviews</a>
+            <a href="about.php" class="nav-link <?= $current_page == 'about.php' ? 'active' : '' ?>">About</a>
+            <a href="faqs.php" class="nav-link <?= $current_page == 'faqs.php' ? 'active' : '' ?>">FAQ</a>
         </div>
     <?php endif; ?>
     <div class="navbar-right">
@@ -381,6 +383,51 @@ $bidHistory = $historyStmt->fetchAll();
             <a href="admin.php?tab=items" class="btn btn-outline">Back to Admin</a>
         <?php elseif (isset($_SESSION['user_id'])): ?>
             <span class="user-greeting">Hi, <?= htmlspecialchars($_SESSION['user_name']) ?></span>
+            <?php
+                    // Get unread notification count
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = FALSE");
+                    $stmt->execute([$_SESSION['user_id']]);
+                    $unreadCount = $stmt->fetchColumn();
+                    ?>
+                    <div class="notification-icon">
+                        <i class="fas fa-bell"></i>
+                        <?php if ($unreadCount > 0): ?>
+                            <span class="notification-badge"><?= $unreadCount ?></span>
+                        <?php endif; ?>
+                        <div class="notification-dropdown">
+                            <div class="notification-header">
+                                <h4>Notifications</h4>
+                                <a href="mark_all_read.php" class="mark-all-read">Mark all as read</a>
+                            </div>
+                            <div class="notification-list">
+                                <?php
+                                $notifications = getUserNotifications($_SESSION['user_id']);
+                                
+                                if (empty($notifications)) {
+                                    echo '<div class="notification-item empty">No notifications</div>';
+                                } else {
+                                    foreach ($notifications as $notification) {
+                                        $class = $notification['is_read'] ? 'read' : 'unread';
+                                        echo '<div class="notification-item '.$class.'">';
+                                        echo htmlspecialchars($notification['message']);
+                                        
+                                        // Add exact time along with relative time
+                                        $createdAt = new DateTime($notification['created_at']);
+                                        $createdAt->setTimezone(new DateTimeZone('Asia/Manila'));
+                                        echo '<div class="notification-time" title="'.$createdAt->format('M j, Y h:i A').'">';
+                                        echo time_elapsed_string($notification['created_at']);
+                                        echo '</div>';
+                                        
+                                        if (!$notification['is_read']) {
+                                            echo '<a href="mark_read.php?id='.$notification['id'].'" class="mark-read">Mark read</a>';
+                                        }
+                                        echo '</div>';
+                                    }
+                                }
+                                ?>
+                            </div>
+                        </div>
+                    </div>
             <a href="logout.php" class="btn btn-outline">Logout</a>
         <?php else: ?>
             <a href="login.php" class="btn btn-outline">Login</a>
@@ -583,7 +630,79 @@ $bidHistory = $historyStmt->fetchAll();
     </main>
 
     <footer class="modern-footer">
-        <!-- Footer content remains the same -->
+        <div class="footer-container">
+            <!-- Top Section - Main Content -->
+            <div class="footer-top">
+                <!-- Brand Info -->
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="images/faviconsss.png" alt="Coffee Auction Logo" style="width:50px;">
+                        <span class="logo-text">TagHammer Auctions</span>
+                    </div>
+                    <p class="footer-tagline">From Rare Collectibles to Everyday Deals, Our All-in-One Auction Platform Lets You Explore, Compete, and Win No Matter Where You Are.</p>
+                    <div class="newsletter">
+                        <h4>Stay Updated</h4>
+                        <form class="newsletter-form">
+                            <input type="email" placeholder="Your email address" required>
+                            <button type="submit" class="btn-subscribe">Subscribe</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-links">
+                    <div class="links-column">
+                        <h4>Navigation</h4>
+                        <ul>
+                            <li><a href="index.php">Home</a></li>
+                            <li><a href="auction.php">Auctions</a></li>
+                            <li><a href="about.php">About Us</a></li>
+                            <li><a href="reviews.php">Reviews</a></li>
+                            <li><a href="faqs.php">FAQ</a></li>
+                        </ul>
+                    </div>
+                    <div class="links-column">
+                        <h4>Legal</h4>
+                        <ul>
+                            <li><a href="terms.php">Terms of Service</a></li>
+                            <li><a href="privacy.php">Privacy Policy</a></li>
+                            <li><a href="refund.php">Refund Policy</a></li>
+                            <li><a href="bidding-rules.php">Bidding Rules</a></li>
+                        </ul>
+                    </div>
+                    <div class="links-column">
+                        <h4>Contact</h4>
+                        <ul class="contact-info">
+                            <li><i class="fas fa-envelope"></i> admin@coffeeauction.com</li>
+                            <li><i class="fas fa-phone"></i> (082)224-1002 | (082) 333-6712</li>
+                            <li><i class="fas fa-map-marker-alt"></i> 2F, Molave Street corner Calamansi Street Juna Subdivision, Matina, Davao City</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Section - Copyright and Social -->
+            <div class="footer-bottom">
+                <div class="copyright">
+                    © 2025 TagHammer Auctions. All rights reserved.
+                </div>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+                <div class="language-selector">
+                    <select aria-label="Language selector">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </footer>
 </body>
 </html>
