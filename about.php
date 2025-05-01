@@ -233,7 +233,7 @@
         position: relative;
     }
 
-    .social-links {
+    .social-linkss {
         position: absolute;
         bottom: 0;
         left: 0;
@@ -247,11 +247,11 @@
         transition: opacity 0.3s ease;
     }
 
-    .team-member:hover .social-links {
+    .team-member:hover .social-linkss {
         opacity: 1;
     }
 
-    .social-links a {
+    .social-linkss a {
         color: white;
         width: 36px;
         height: 36px;
@@ -263,7 +263,7 @@
         transition: all 0.3s ease;
     }
 
-    .social-links a:hover {
+    .social-linkss a:hover {
         background-color: var(--primary-color);
         transform: translateY(-3px);
     }
@@ -553,7 +553,7 @@
             <div class="team-grid">
                 <div class="team-member">
                     <div class="member-photo" style="background-image: url('images/23.jpg');">
-                        <div class="social-links">
+                        <div class="social-linkss">
                             <a href="#"><i class="fab fa-linkedin-in"></i></a>
                             <a href="#"><i class="fab fa-twitter"></i></a>
                             <a href="#"><i class="fas fa-envelope"></i></a>
@@ -567,7 +567,7 @@
                 </div>
                 <div class="team-member">
                     <div class="member-photo" style="background-image: url('images/24.jfif');">
-                        <div class="social-links">
+                        <div class="social-linkss">
                             <a href="#"><i class="fab fa-linkedin-in"></i></a>
                             <a href="#"><i class="fab fa-instagram"></i></a>
                             <a href="#"><i class="fas fa-envelope"></i></a>
@@ -581,7 +581,7 @@
                 </div>
                 <div class="team-member">
                     <div class="member-photo" style="background-image: url('images/25.jfif');">
-                        <div class="social-links">
+                        <div class="social-linkss">
                             <a href="#"><i class="fab fa-github"></i></a>
                             <a href="#"><i class="fab fa-twitter"></i></a>
                             <a href="#"><i class="fas fa-envelope"></i></a>
@@ -653,10 +653,10 @@
                     <div class="links-column">
                         <h4>Legal</h4>
                         <ul>
-                            <li><a href="terms.php">Terms of Service</a></li>
-                            <li><a href="privacy.php">Privacy Policy</a></li>
-                            <li><a href="refund.php">Refund Policy</a></li>
-                            <li><a href="bidding-rules.php">Bidding Rules</a></li>
+                            <li>Terms of Service</li>
+                            <li>Privacy Policy</li>
+                            <li>Refund Policy</li>
+                            <li>Bidding Rules</li>
                         </ul>
                     </div>
                     <div class="links-column">
@@ -681,14 +681,6 @@
                     <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                     <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                     <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                </div>
-                <div class="language-selector">
-                    <select aria-label="Language selector">
-                        <option value="en">English</option>
-                        <option value="es">Español</option>
-                        <option value="fr">Français</option>
-                        <option value="de">Deutsch</option>
-                    </select>
                 </div>
             </div>
         </div>

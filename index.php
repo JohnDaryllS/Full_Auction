@@ -554,80 +554,72 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
 </section>
 
 <footer class="modern-footer">
-    <div class="footer-container">
-        <!-- Top Section - Main Content -->
-        <div class="footer-top">
-            <!-- Brand Info -->
-            <div class="footer-brand">
-                <div class="footer-logo">
-                    <img src="images/faviconsss.png" alt="Coffee Auction Logo" style="width:50px;">
-                    <span class="logo-text">TagHammer Auctions</span>
+        <div class="footer-container">
+            <!-- Top Section - Main Content -->
+            <div class="footer-top">
+                <!-- Brand Info -->
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="images/faviconsss.png" alt="Coffee Auction Logo" style="width:50px;">
+                        <span class="logo-text">TagHammer Auctions</span>
+                    </div>
+                    <p class="footer-tagline">From Rare Collectibles to Everyday Deals, Our All-in-One Auction Platform Lets You Explore, Compete, and Win No Matter Where You Are.</p>
+                    <div class="newsletter">
+                        <h4>Stay Updated</h4>
+                        <form class="newsletter-form">
+                            <input type="email" placeholder="Your email address" required>
+                            <button type="submit" class="btn-subscribe">Subscribe</button>
+                        </form>
+                    </div>
                 </div>
-                <p class="footer-tagline">From Rare Collectibles to Everyday Deals, Our All-in-One Auction Platform Lets You Explore, Compete, and Win No Matter Where You Are.</p>
-                <div class="newsletter">
-                    <h4>Stay Updated</h4>
-                    <form class="newsletter-form">
-                        <input type="email" placeholder="Your email address" required>
-                        <button type="submit" class="btn-subscribe">Subscribe</button>
-                    </form>
+
+                <!-- Quick Links -->
+                <div class="footer-links">
+                    <div class="links-column">
+                        <h4>Navigation</h4>
+                        <ul>
+                            <li><a href="index.php">Home</a></li>
+                            <li><a href="auction.php">Auctions</a></li>
+                            <li><a href="about.php">About Us</a></li>
+                            <li><a href="reviews.php">Reviews</a></li>
+                            <li><a href="faqs.php">FAQ</a></li>
+                        </ul>
+                    </div>
+                    <div class="links-column">
+                        <h4>Legal</h4>
+                        <ul>
+                            <li>Terms of Service</li>
+                            <li>Privacy Policy</li>
+                            <li>Refund Policy</li>
+                            <li>Bidding Rules</li>
+                        </ul>
+                    </div>
+                    <div class="links-column">
+                        <h4>Contact</h4>
+                        <ul class="contact-info">
+                            <li><i class="fas fa-envelope"></i> admin@coffeeauction.com</li>
+                            <li><i class="fas fa-phone"></i> (082)224-1002 | (082) 333-6712</li>
+                            <li><i class="fas fa-map-marker-alt"></i> 2F, Molave Street corner Calamansi Street Juna Subdivision, Matina, Davao City</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
-            <!-- Quick Links -->
-            <div class="footer-links">
-                <div class="links-column">
-                    <h4>Navigation</h4>
-                    <ul>
-                        <li><a href="index.php">Home</a></li>
-                        <li><a href="auction.php">Auctions</a></li>
-                        <li><a href="about.php">About Us</a></li>
-                        <li><a href="reviews.php">Reviews</a></li>
-                        <li><a href="faqs.php">FAQ</a></li>
-                    </ul>
+            <!-- Bottom Section - Copyright and Social -->
+            <div class="footer-bottom">
+                <div class="copyright">
+                    © 2025 TagHammer Auctions. All rights reserved.
                 </div>
-                <div class="links-column">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="terms.php">Terms of Service</a></li>
-                        <li><a href="privacy.php">Privacy Policy</a></li>
-                        <li><a href="refund.php">Refund Policy</a></li>
-                        <li><a href="bidding-rules.php">Bidding Rules</a></li>
-                    </ul>
-                </div>
-                <div class="links-column">
-                    <h4>Contact</h4>
-                    <ul class="contact-info">
-                        <li><i class="fas fa-envelope"></i> admin@coffeeauction.com</li>
-                        <li><i class="fas fa-phone"></i> (082)224-1002 | (082) 333-6712</li>
-                        <li><i class="fas fa-map-marker-alt"></i> 2F, Molave Street corner Calamansi Street Juna Subdivision, Matina, Davao City</li>
-                    </ul>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                 </div>
             </div>
         </div>
-
-        <!-- Bottom Section - Copyright and Social -->
-        <div class="footer-bottom">
-            <div class="copyright">
-                © 2025 TagHammer Auctions. All rights reserved.
-            </div>
-            <div class="social-links">
-                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-            </div>
-            <div class="language-selector">
-                <select aria-label="Language selector">
-                    <option value="en">English</option>
-                    <option value="es">Español</option>
-                    <option value="fr">Français</option>
-                    <option value="de">Deutsch</option>
-                </select>
-            </div>
-        </div>
-    </div>
-</footer>
+    </footer>
 
 <div class="legal-modal-overlay" id="legalModal">
         <div class="legal-modal">

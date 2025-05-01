@@ -610,16 +610,16 @@ $reviews = $pdo->query($query)->fetchAll();
                             <li><a href="auction.php">Auctions</a></li>
                             <li><a href="about.php">About Us</a></li>
                             <li><a href="reviews.php">Reviews</a></li>
-                            <li><a href="faq.php">FAQ</a></li>
+                            <li><a href="faqs.php">FAQ</a></li>
                         </ul>
                     </div>
                     <div class="links-column">
                         <h4>Legal</h4>
                         <ul>
-                            <li><a href="terms.php">Terms of Service</a></li>
-                            <li><a href="privacy.php">Privacy Policy</a></li>
-                            <li><a href="refund.php">Refund Policy</a></li>
-                            <li><a href="bidding-rules.php">Bidding Rules</a></li>
+                            <li>Terms of Service</li>
+                            <li>Privacy Policy</li>
+                            <li>Refund Policy</li>
+                            <li>Bidding Rules</li>
                         </ul>
                     </div>
                     <div class="links-column">
@@ -644,14 +644,6 @@ $reviews = $pdo->query($query)->fetchAll();
                     <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                     <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                     <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                </div>
-                <div class="language-selector">
-                    <select aria-label="Language selector">
-                        <option value="en">English</option>
-                        <option value="es">Español</option>
-                        <option value="fr">Français</option>
-                        <option value="de">Deutsch</option>
-                    </select>
                 </div>
             </div>
         </div>
