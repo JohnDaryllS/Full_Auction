@@ -619,7 +619,79 @@
         </section> -->
 
         <footer class="modern-footer">
-        <!-- Footer content remains the same -->
+        <div class="footer-container">
+            <!-- Top Section - Main Content -->
+            <div class="footer-top">
+                <!-- Brand Info -->
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="images/faviconsss.png" alt="Coffee Auction Logo" style="width:50px;">
+                        <span class="logo-text">TagHammer Auctions</span>
+                    </div>
+                    <p class="footer-tagline">Discover the world's finest coffee beans through exclusive auctions</p>
+                    <div class="newsletter">
+                        <h4>Stay Updated</h4>
+                        <form class="newsletter-form">
+                            <input type="email" placeholder="Your email address" required>
+                            <button type="submit" class="btn-subscribe">Subscribe</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-links">
+                    <div class="links-column">
+                        <h4>Navigation</h4>
+                        <ul>
+                            <li><a href="index.php">Home</a></li>
+                            <li><a href="auction.php">Auctions</a></li>
+                            <li><a href="about.php">About Us</a></li>
+                            <li><a href="contact.php">Contact Us</a></li>
+                            <li><a href="faq.php">FAQ</a></li>
+                        </ul>
+                    </div>
+                    <div class="links-column">
+                        <h4>Legal</h4>
+                        <ul>
+                            <li><a href="terms.php">Terms of Service</a></li>
+                            <li><a href="privacy.php">Privacy Policy</a></li>
+                            <li><a href="refund.php">Refund Policy</a></li>
+                            <li><a href="bidding-rules.php">Bidding Rules</a></li>
+                        </ul>
+                    </div>
+                    <div class="links-column">
+                        <h4>Contact</h4>
+                        <ul class="contact-info">
+                            <li><i class="fas fa-envelope"></i> info@coffeeauction.com</li>
+                            <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                            <li><i class="fas fa-map-marker-alt"></i> 123 Coffee Lane, Portland, OR 97204</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Section - Copyright and Social -->
+            <div class="footer-bottom">
+                <div class="copyright">
+                    © 2025 TagHammer Auctions. All rights reserved.
+                </div>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+                <div class="language-selector">
+                    <select aria-label="Language selector">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </footer>
 
     <script>

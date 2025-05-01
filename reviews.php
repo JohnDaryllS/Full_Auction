@@ -1,19 +1,20 @@
 <?php 
 include 'db_connect.php';
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit;
-}
+// Get current page filename
+$current_page = basename($_SERVER['PHP_SELF']);
+$is_home = ($current_page == 'index.php' || $current_page == 'user_account.php');
 
 // Pagination settings
 $reviews_per_page = 8;
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $offset = ($page - 1) * $reviews_per_page;
 
-// Process form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Get selected category filter
+$category_filter = isset($_GET['category']) ? (int)$_GET['category'] : 0;
+
+// Process form submission (only for logged-in users)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])) {
     $category_id = (int)$_POST['category_id'];
     $rating = (int)$_POST['rating'];
     $description = trim($_POST['description']);
@@ -69,9 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Check if editing a review
+// Check if editing a review (only for logged-in users)
 $editing_review = null;
-if (isset($_GET['edit'])) {
+if (isset($_GET['edit']) && isset($_SESSION['user_id'])) {
     $review_id = (int)$_GET['edit'];
     $stmt = $pdo->prepare("SELECT * FROM reviews WHERE id = ? AND user_id = ?");
     $stmt->execute([$review_id, $_SESSION['user_id']]);
@@ -81,13 +82,8 @@ if (isset($_GET['edit'])) {
 // Get all categories for the dropdown
 $categories = $pdo->query("SELECT * FROM auction_types ORDER BY name ASC")->fetchAll();
 
-// Get user's reviews count for pagination
-$user_id = $_SESSION['user_id'];
-$total_reviews = $pdo->query("SELECT COUNT(*) FROM reviews WHERE user_id = $user_id")->fetchColumn();
-$total_pages = ceil($total_reviews / $reviews_per_page);
-
-// Get paginated reviews with user and category info
-$reviews = $pdo->query("
+// Build query for reviews with filters
+$query = "
     SELECT r.*, 
            u.fullname as user_name,
            t.name as category_name,
@@ -95,10 +91,25 @@ $reviews = $pdo->query("
     FROM reviews r
     JOIN users u ON r.user_id = u.id
     JOIN auction_types t ON r.category_id = t.id
-    WHERE r.user_id = $user_id
-    ORDER BY r.created_at DESC
-    LIMIT $offset, $reviews_per_page
-")->fetchAll();
+";
+
+$count_query = "SELECT COUNT(*) FROM reviews r";
+
+// Add category filter if selected
+if ($category_filter > 0) {
+    $query .= " WHERE r.category_id = $category_filter";
+    $count_query .= " WHERE r.category_id = $category_filter";
+}
+
+// Complete queries
+$query .= " ORDER BY r.created_at DESC LIMIT $offset, $reviews_per_page";
+
+// Get total reviews count for pagination
+$total_reviews = $pdo->query($count_query)->fetchColumn();
+$total_pages = ceil($total_reviews / $reviews_per_page);
+
+// Get paginated reviews with user and category info
+$reviews = $pdo->query($query)->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -288,6 +299,27 @@ $reviews = $pdo->query("
             color: #666;
             font-size: 1.1rem;
         }
+        
+        .category-filter {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+        
+        .category-filter label {
+            font-weight: 500;
+        }
+        
+        .category-filter select {
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .category-filter .btn {
+            padding: 0.5rem 1rem;
+        }
     </style>
 </head>
 <body>
@@ -364,92 +396,114 @@ $reviews = $pdo->query("
     </nav>
 
     <main class="reviews-container">
-        <h1><?= $editing_review ? 'Edit Your Review' : 'Leave a Review' ?></h1>
-        
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-error"><?= $_SESSION['error'] ?></div>
-            <?php unset($_SESSION['error']); ?>
-        <?php endif; ?>
-        
-        <?php if (isset($_SESSION['message'])): ?>
-            <div class="alert alert-success"><?= $_SESSION['message'] ?></div>
-            <?php unset($_SESSION['message']); ?>
-        <?php endif; ?>
-        
-        <div class="review-form">
-            <form action="reviews.php" method="post">
-                <?php if ($editing_review): ?>
-                    <input type="hidden" name="review_id" value="<?= $editing_review['id'] ?>">
-                <?php endif; ?>
-                
-                <div class="form-group">
-                    <label for="category">Select Category</label>
-                    <select id="category" name="category_id" class="form-control" required <?= $editing_review ? 'disabled' : '' ?>>
-                        <option value="">-- Select a category --</option>
-                        <?php foreach ($categories as $category): ?>
-                            <option value="<?= $category['id'] ?>" 
-                                <?= ($editing_review && $editing_review['category_id'] == $category['id']) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($category['name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <h1><?= $editing_review ? 'Edit Your Review' : 'Leave a Review' ?></h1>
+            
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="alert alert-error"><?= $_SESSION['error'] ?></div>
+                <?php unset($_SESSION['error']); ?>
+            <?php endif; ?>
+            
+            <?php if (isset($_SESSION['message'])): ?>
+                <div class="alert alert-success"><?= $_SESSION['message'] ?></div>
+                <?php unset($_SESSION['message']); ?>
+            <?php endif; ?>
+            
+            <div class="review-form">
+                <form action="reviews.php" method="post">
                     <?php if ($editing_review): ?>
-                        <small>Note: You cannot change the category for an existing review</small>
+                        <input type="hidden" name="review_id" value="<?= $editing_review['id'] ?>">
                     <?php endif; ?>
-                </div>
-                
-                <div class="form-group">
-                    <label>Your Rating</label>
-                    <div class="rating-stars">
-                        <?php for ($i = 5; $i >= 1; $i--): ?>
-                            <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" 
-                                <?= ($editing_review && $editing_review['rating'] == $i) ? 'checked' : '' ?> required>
-                            <label for="star<?= $i ?>"><i class="fas fa-star"></i></label>
-                        <?php endfor; ?>
+                    
+                    <div class="form-group">
+                        <label for="category">Select Category</label>
+                        <select id="category" name="category_id" class="form-control" required <?= $editing_review ? 'disabled' : '' ?>>
+                            <option value="">-- Select a category --</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= $category['id'] ?>" 
+                                    <?= ($editing_review && $editing_review['category_id'] == $category['id']) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($category['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php if ($editing_review): ?>
+                            <small>Note: You cannot change the category for an existing review</small>
+                        <?php endif; ?>
                     </div>
-                </div>
-                
-                <div class="anonymous-checkbox">
-                    <input type="checkbox" id="is_anonymous" name="is_anonymous" value="1"
-                        <?= ($editing_review && $editing_review['is_anonymous']) ? 'checked' : '' ?>>
-                    <label for="is_anonymous">Post this review anonymously</label>
-                </div>
-                
-                <div class="form-group">
-                    <label for="description">Your Review</label>
-                    <textarea id="description" name="description" required><?= 
-                        $editing_review ? htmlspecialchars($editing_review['description']) : '' 
-                    ?></textarea>
-                </div>
-                
-                <button type="submit" class="btn btn-primary">
-                    <?= $editing_review ? 'Update Review' : 'Submit Review' ?>
-                </button>
-                
-                <?php if ($editing_review): ?>
-                    <a href="reviews.php" class="btn btn-outline">Cancel</a>
+                    
+                    <div class="form-group">
+                        <label>Your Rating</label>
+                        <div class="rating-stars">
+                            <?php for ($i = 5; $i >= 1; $i--): ?>
+                                <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" 
+                                    <?= ($editing_review && $editing_review['rating'] == $i) ? 'checked' : '' ?> required>
+                                <label for="star<?= $i ?>"><i class="fas fa-star"></i></label>
+                            <?php endfor; ?>
+                        </div>
+                    </div>
+                    
+                    <div class="anonymous-checkbox">
+                        <input type="checkbox" id="is_anonymous" name="is_anonymous" value="1"
+                            <?= ($editing_review && $editing_review['is_anonymous']) ? 'checked' : '' ?>>
+                        <label for="is_anonymous">Post this review anonymously</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Your Review</label>
+                        <textarea id="description" name="description" required><?= 
+                            $editing_review ? htmlspecialchars($editing_review['description']) : '' 
+                        ?></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <?= $editing_review ? 'Update Review' : 'Submit Review' ?>
+                    </button>
+                    
+                    <?php if ($editing_review): ?>
+                        <a href="reviews.php" class="btn btn-outline">Cancel</a>
+                    <?php endif; ?>
+                </form>
+            </div>
+        <?php endif; ?>
+        
+        <h2>Customer Reviews</h2>
+        
+        <!-- Category Filter -->
+        <div class="category-filter">
+            <form method="get" action="reviews.php">
+                <label for="category-filter">Filter by Category:</label>
+                <select id="category-filter" name="category" onchange="this.form.submit()">
+                    <option value="0">All Categories</option>
+                    <?php foreach ($categories as $category): ?>
+                        <option value="<?= $category['id'] ?>" <?= $category_filter == $category['id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($category['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <input type="hidden" name="page" value="1">
+                <?php if ($category_filter > 0): ?>
+                    <a href="reviews.php" class="btn btn-outline">Clear Filter</a>
                 <?php endif; ?>
             </form>
         </div>
         
-        <h2>Your Reviews</h2>
         <div class="reviews-list">
             <?php if (empty($reviews)): ?>
                 <div class="no-reviews">
-                    You haven't submitted any reviews yet.
+                    No reviews found for this category.
                 </div>
             <?php else: ?>
                 <?php foreach ($reviews as $review): ?>
                     <div class="review-card">
                         <div class="review-header">
                             <div class="reviewer-info">
-                            <div class="reviewer-avatar">
-                                <?= isset($review['is_anonymous']) && $review['is_anonymous'] ? 'A' : substr($review['user_name'], 0, 1) ?>
-                            </div>
-                                <div>
-                                <div class="reviewer-name">
-                                    <?= (isset($review['is_anonymous']) && $review['is_anonymous']) ? 'Anonymous' : htmlspecialchars($review['user_name']) ?>
+                                <div class="reviewer-avatar">
+                                    <?= $review['is_anonymous'] ? 'A' : substr($review['user_name'], 0, 1) ?>
                                 </div>
+                                <div>
+                                    <div class="reviewer-name">
+                                        <?= $review['is_anonymous'] ? 'Anonymous' : htmlspecialchars($review['user_name']) ?>
+                                    </div>
                                     <div class="review-category">
                                         <span>Reviewed</span>
                                         <span class="category-badge"><?= htmlspecialchars($review['category_name']) ?></span>
@@ -457,9 +511,11 @@ $reviews = $pdo->query("
                                 </div>
                             </div>
                             <div class="review-actions">
-                                <a href="reviews.php?edit=<?= $review['id'] ?>" class="btn btn-small btn-outline">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
+                                <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $review['user_id']): ?>
+                                    <a href="reviews.php?edit=<?= $review['id'] ?>" class="btn btn-small btn-outline">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                <?php endif; ?>
                                 <span class="review-date">
                                     <?= date('M j, Y', strtotime($review['created_at'])) ?>
                                 </span>
@@ -523,5 +579,81 @@ $reviews = $pdo->query("
             </div>
         <?php endif; ?>
     </main>
+
+    <footer class="modern-footer">
+        <div class="footer-container">
+            <!-- Top Section - Main Content -->
+            <div class="footer-top">
+                <!-- Brand Info -->
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="images/faviconsss.png" alt="Coffee Auction Logo" style="width:50px;">
+                        <span class="logo-text">TagHammer Auctions</span>
+                    </div>
+                    <p class="footer-tagline">Discover the world's finest coffee beans through exclusive auctions</p>
+                    <div class="newsletter">
+                        <h4>Stay Updated</h4>
+                        <form class="newsletter-form">
+                            <input type="email" placeholder="Your email address" required>
+                            <button type="submit" class="btn-subscribe">Subscribe</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-links">
+                    <div class="links-column">
+                        <h4>Navigation</h4>
+                        <ul>
+                            <li><a href="index.php">Home</a></li>
+                            <li><a href="auction.php">Auctions</a></li>
+                            <li><a href="about.php">About Us</a></li>
+                            <li><a href="contact.php">Contact Us</a></li>
+                            <li><a href="faq.php">FAQ</a></li>
+                        </ul>
+                    </div>
+                    <div class="links-column">
+                        <h4>Legal</h4>
+                        <ul>
+                            <li><a href="terms.php">Terms of Service</a></li>
+                            <li><a href="privacy.php">Privacy Policy</a></li>
+                            <li><a href="refund.php">Refund Policy</a></li>
+                            <li><a href="bidding-rules.php">Bidding Rules</a></li>
+                        </ul>
+                    </div>
+                    <div class="links-column">
+                        <h4>Contact</h4>
+                        <ul class="contact-info">
+                            <li><i class="fas fa-envelope"></i> info@coffeeauction.com</li>
+                            <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                            <li><i class="fas fa-map-marker-alt"></i> 123 Coffee Lane, Portland, OR 97204</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Section - Copyright and Social -->
+            <div class="footer-bottom">
+                <div class="copyright">
+                    © 2025 TagHammer Auctions. All rights reserved.
+                </div>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+                <div class="language-selector">
+                    <select aria-label="Language selector">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

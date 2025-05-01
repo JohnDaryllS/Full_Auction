@@ -280,6 +280,61 @@ $currentDateTime = date('Y-m-d\TH:i');
             border-radius: 3px;
             object-fit: cover;
         }
+
+        .winner-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .winner-actions .btn {
+            padding: 5px 8px;
+            font-size: 0.8rem;
+        }
+
+        .unread-message {
+            background-color: #f0f7ff;
+        }
+
+        .message-info {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .message-content {
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .modal .close {
+            float: right;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
         
         /* Responsive Adjustments */
         @media (max-width: 768px) {
@@ -331,6 +386,9 @@ $currentDateTime = date('Y-m-d\TH:i');
             <button class="tab-btn <?= ($_GET['tab'] ?? 'users') === 'users' ? 'active' : '' ?>" data-tab="users">User Management</button>
             <button class="tab-btn <?= ($_GET['tab'] ?? '') === 'items' ? 'active' : '' ?>" data-tab="items">Auction Items</button>
             <button class="tab-btn <?= ($_GET['tab'] ?? '') === 'types' ? 'active' : '' ?>" data-tab="types">Auction Types</button>
+            <button class="tab-btn <?= ($_GET['tab'] ?? '') === 'reviews' ? 'active' : '' ?>" data-tab="reviews">Reviews Management</button>
+            <button class="tab-btn <?= ($_GET['tab'] ?? '') === 'winners' ? 'active' : '' ?>" data-tab="winners">Auction Winners</button>
+            <button class="tab-btn <?= ($_GET['tab'] ?? '') === 'contacts' ? 'active' : '' ?>" data-tab="contacts">User Messages</button>
         </div>
         
         <section class="tab-content <?= ($_GET['tab'] ?? 'users') === 'users' ? 'active' : '' ?>" id="users-tab">
@@ -811,7 +869,245 @@ $currentDateTime = date('Y-m-d\TH:i');
                 </table>
             </div>
         </section>
+
+        <section class="tab-content <?= ($_GET['tab'] ?? '') === 'reviews' ? 'active' : '' ?>" id="reviews-tab">
+            <h2>Reviews Management</h2>
+            
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Category</th>
+                            <th>Rating</th>
+                            <th>Review</th>
+                            <th>Anonymous</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $reviews = $pdo->query("
+                            SELECT r.*, 
+                                u.fullname as user_name,
+                                t.name as category_name
+                            FROM reviews r
+                            JOIN users u ON r.user_id = u.id
+                            JOIN auction_types t ON r.category_id = t.id
+                            ORDER BY r.created_at DESC
+                        ");
+                        
+                        while ($review = $reviews->fetch()): 
+                        ?>
+                            <tr>
+                                <td><?= $review['id'] ?></td>
+                                <td><?= htmlspecialchars($review['user_name']) ?></td>
+                                <td><?= htmlspecialchars($review['category_name']) ?></td>
+                                <td>
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <i class="fas fa-star<?= $i > $review['rating'] ? '-empty' : '' ?>"></i>
+                                    <?php endfor; ?>
+                                </td>
+                                <td><?= htmlspecialchars(substr($review['description'], 0, 50)) ?><?= strlen($review['description']) > 50 ? '...' : '' ?></td>
+                                <td><?= $review['is_anonymous'] ? 'Yes' : 'No' ?></td>
+                                <td><?= date('M j, Y', strtotime($review['created_at'])) ?></td>
+                                <td>
+                                    <form action="process_review.php" method="post" class="inline-form">
+                                        <input type="hidden" name="review_id" value="<?= $review['id'] ?>">
+                                        <button type="submit" name="action" value="delete" class="btn btn-error btn-small"
+                                                onclick="return confirm('Are you sure you want to delete this review?')">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="tab-content <?= ($_GET['tab'] ?? '') === 'winners' ? 'active' : '' ?>" id="winners-tab">
+            <h2>Auction Winners</h2>
+            
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Auction ID</th>
+                            <th>Item Name</th>
+                            <th>Winner</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Winning Bid</th>
+                            <th>Bid Time</th>
+                            <th>Auction Ended</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $winners = $pdo->query("
+                            SELECT 
+                                i.id as item_id,
+                                i.name as item_name,
+                                u.id as user_id,
+                                u.fullname as winner_name,
+                                u.email,
+                                u.phone,
+                                MAX(b.bid_amount) as winning_bid,
+                                MAX(b.timestamp) as bid_time,
+                                i.bid_end_date
+                            FROM items i
+                            JOIN bids b ON i.id = b.item_id
+                            JOIN users u ON b.user_id = u.id
+                            WHERE i.bid_end_date < NOW()
+                            GROUP BY i.id
+                            ORDER BY i.bid_end_date DESC
+                        ");
+                        
+                        while ($winner = $winners->fetch()): 
+                        ?>
+                            <tr>
+                                <td><?= $winner['item_id'] ?></td>
+                                <td><?= htmlspecialchars($winner['item_name']) ?></td>
+                                <td><?= htmlspecialchars($winner['winner_name']) ?></td>
+                                <td><?= htmlspecialchars($winner['email']) ?></td>
+                                <td><?= htmlspecialchars($winner['phone']) ?></td>
+                                <td>₱<?= number_format($winner['winning_bid'], 2) ?></td>
+                                <td><?= date('M j, Y H:i', strtotime($winner['bid_time'])) ?></td>
+                                <td><?= date('M j, Y H:i', strtotime($winner['bid_end_date'])) ?></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="product_view.php?id=<?= $winner['item_id'] ?>&admin=1" 
+                                        class="btn btn-outline btn-small" 
+                                        title="View Auction">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="mailto:<?= htmlspecialchars($winner['email']) ?>" 
+                                        class="btn btn-outline btn-small" 
+                                        title="Email Winner">
+                                            <i class="fas fa-envelope"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="tab-content <?= ($_GET['tab'] ?? '') === 'contacts' ? 'active' : '' ?>" id="contacts-tab">
+            <h2>User Messages</h2>
+            
+            <div class="admin-actions">
+                <form method="get" action="admin.php" class="search-form">
+                    <input type="hidden" name="tab" value="contacts">
+                    <div class="form-group">
+                        <select name="status" onchange="this.form.submit()">
+                            <option value="">All Messages</option>
+                            <option value="unread" <?= ($_GET['status'] ?? '') === 'unread' ? 'selected' : '' ?>>Unread</option>
+                            <option value="read" <?= ($_GET['status'] ?? '') === 'read' ? 'selected' : '' ?>>Read</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $status_filter = $_GET['status'] ?? '';
+                        $query = "SELECT c.*, u.fullname as user_name 
+                                FROM admin_contacts c
+                                LEFT JOIN users u ON c.user_id = u.id";
+                        
+                        if ($status_filter) {
+                            $query .= " WHERE c.status = ?";
+                        }
+                        
+                        $query .= " ORDER BY c.created_at DESC";
+                        
+                        $stmt = $pdo->prepare($query);
+                        $stmt->execute($status_filter ? [$status_filter] : []);
+                        
+                        while ($contact = $stmt->fetch()): 
+                        ?>
+                            <tr class="<?= $contact['status'] === 'unread' ? 'unread-message' : '' ?>">
+                                <td><?= $contact['id'] ?></td>
+                                <td><?= $contact['user_name'] ? htmlspecialchars($contact['user_name']) : htmlspecialchars($contact['name']) ?></td>
+                                <td><?= htmlspecialchars($contact['email']) ?></td>
+                                <td><?= htmlspecialchars($contact['subject']) ?></td>
+                                <td><?= htmlspecialchars(substr($contact['message'], 0, 50)) ?><?= strlen($contact['message']) > 50 ? '...' : '' ?></td>
+                                <td><?= date('M j, Y H:i', strtotime($contact['created_at'])) ?></td>
+                                <td>
+                                    <span class="status-badge <?= $contact['status'] ?>">
+                                        <?= ucfirst($contact['status']) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button onclick="openMessageModal(<?= $contact['id'] ?>)" 
+                                                class="btn btn-outline btn-small">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                        <form action="process_contact.php" method="post" class="inline-form">
+                                            <input type="hidden" name="contact_id" value="<?= $contact['id'] ?>">
+                                            <button type="submit" name="action" value="delete" 
+                                                    class="btn btn-error btn-small"
+                                                    onclick="return confirm('Delete this message?')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
+
+    <!-- Add this modal at the bottom of admin.php -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="messageSubject"></h3>
+            <div class="message-info">
+                <p><strong>From:</strong> <span id="messageSender"></span></p>
+                <p><strong>Email:</strong> <span id="messageEmail"></span></p>
+                <p><strong>Date:</strong> <span id="messageDate"></span></p>
+            </div>
+            <div class="message-content" id="messageContent"></div>
+            <div class="form-actions">
+                <form action="process_contact.php" method="post" class="inline-form">
+                    <input type="hidden" name="contact_id" id="modalContactId">
+                    <button type="submit" name="action" value="mark_read" class="btn btn-primary">
+                        Mark as Read
+                    </button>
+                </form>
+                <button class="btn btn-outline" onclick="document.getElementById('messageModal').style.display='none'">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Password Reset Modal -->
     <div id="passwordModal" class="modal">
@@ -840,6 +1136,8 @@ $currentDateTime = date('Y-m-d\TH:i');
             </form>
         </div>
     </div>
+
+    <script src="js/messageModal.js"></script>
 
     <script>
 document.addEventListener('DOMContentLoaded', function() {

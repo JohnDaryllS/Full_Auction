@@ -171,6 +171,65 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
             font-size: 0.8rem;
         }
 
+        .contact-admin-section {
+            background-color: #f9f9f9;
+            padding: 3rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid #eee;
+        }
+
+        .contact-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .contact-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .contact-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1);
+        }
+
+        .contact-form textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .contact-form button {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+        }
+
         /* Responsive Styles */
         @media (max-width: 768px) {
             .hero h1 {
@@ -328,5 +387,111 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
             </div>
         </section>
     </main>
+
+    <section class="contact-admin-section">
+    <div class="contact-container">
+        <h2>Need Help? Contact Our Administrators</h2>
+        <div class="contact-form">
+            <form id="contactAdminForm" action="process_contact.php" method="post">
+                <div class="form-group">
+                    <label for="contactName">Your Name</label>
+                    <input type="text" id="contactName" name="name" required 
+                           value="<?= isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : '' ?>">
+                </div>
+                <div class="form-group">
+                    <label for="contactEmail">Your Email</label>
+                    <input type="email" id="contactEmail" name="email" required
+                           value="<?= isset($_SESSION['user_email']) ? htmlspecialchars($_SESSION['user_email']) : '' ?>">
+                </div>
+                <div class="form-group">
+                    <label for="contactSubject">Subject</label>
+                    <input type="text" id="contactSubject" name="subject" required>
+                </div>
+                <div class="form-group">
+                    <label for="contactMessage">Message</label>
+                    <textarea id="contactMessage" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<footer class="modern-footer">
+    <div class="footer-container">
+        <!-- Top Section - Main Content -->
+        <div class="footer-top">
+            <!-- Brand Info -->
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <img src="images/faviconsss.png" alt="Coffee Auction Logo" style="width:50px;">
+                    <span class="logo-text">TagHammer Auctions</span>
+                </div>
+                <p class="footer-tagline">Discover the world's finest coffee beans through exclusive auctions</p>
+                <div class="newsletter">
+                    <h4>Stay Updated</h4>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your email address" required>
+                        <button type="submit" class="btn-subscribe">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="footer-links">
+                <div class="links-column">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.php">Home</a></li>
+                        <li><a href="auction.php">Auctions</a></li>
+                        <li><a href="about.php">About Us</a></li>
+                        <li><a href="contact.php">Contact Us</a></li>
+                        <li><a href="faq.php">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="links-column">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="terms.php">Terms of Service</a></li>
+                        <li><a href="privacy.php">Privacy Policy</a></li>
+                        <li><a href="refund.php">Refund Policy</a></li>
+                        <li><a href="bidding-rules.php">Bidding Rules</a></li>
+                    </ul>
+                </div>
+                <div class="links-column">
+                    <h4>Contact</h4>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-envelope"></i> info@coffeeauction.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Coffee Lane, Portland, OR 97204</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Section - Copyright and Social -->
+        <div class="footer-bottom">
+            <div class="copyright">
+                © 2025 TagHammer Auctions. All rights reserved.
+            </div>
+            <div class="social-links">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <div class="language-selector">
+                <select aria-label="Language selector">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</footer>
+
 </body>
 </html>
