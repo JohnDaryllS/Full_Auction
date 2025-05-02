@@ -659,7 +659,7 @@ $currentDateTime = date('Y-m-d\TH:i');
                         </div>
                         
                         <div class="form-group">
-                            <label for="item-name">Coffee Name</label>
+                            <label for="item-name">Item Name</label>
                             <input type="text" id="item-name" name="name" class="form-control" required>
                         </div>
                         

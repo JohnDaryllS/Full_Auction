@@ -27,6 +27,32 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Add this to your existing CSS */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        /* For mobile devices */
+        @media (max-width: 768px) {
+            .navbar.scrolled {
+                padding: 10px 0;
+            }
+
+            .navbar.scrolled .navbar-center,
+            .navbar.scrolled .navbar-right {
+                display: none;
+            }
+
+            .navbar.scrolled .navbar-left {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
         /* Hero Section */
         .hero {
             background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/432.png');
@@ -39,6 +65,7 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
             display: flex;
             align-items: center;
             text-align: center;
+            margin-top: 80px;
         }
 
         .hero-content {
@@ -261,7 +288,6 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
             width: 90%;
             max-width: 800px;
             max-height: 80vh;
-            overflow-y: auto;
             box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
             transform: translateY(-50px);
             transition: all 0.3s ease;
@@ -712,7 +738,12 @@ $highestBid = $highestBidItem ? ($highestBidItem['max_bid'] ?: $highestBidItem['
         </div>
     </div>
 
-<script src="js/terms.js"></script>
+    <button id="scrollToTopBtn" class="scroll-to-top" aria-label="Scroll to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
+<script src="js/scrollup.js"></script>
+<script src="js/terms.js"></script>
+<script src="js/scroll.js"></script>
 </body>
 </html>

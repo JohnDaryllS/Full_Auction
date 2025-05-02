@@ -648,5 +648,10 @@ $reviews = $pdo->query($query)->fetchAll();
             </div>
         </div>
     </footer>
+    <button id="scrollToTopBtn" class="scroll-to-top" aria-label="Scroll to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+<script src="js/scrollup.js"></script>
 </body>
 </html>

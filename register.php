@@ -153,6 +153,7 @@
             </div>
         </div>
     </footer>
+    
 <script>
         function validateForm() {
             const password = document.getElementById('password').value;

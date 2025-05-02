@@ -1,4 +1,9 @@
-<?php include 'db_connect.php'; ?>
+<?php include 'db_connect.php'; 
+
+// Get current page filename
+$current_page = basename($_SERVER['PHP_SELF']);
+$is_home = ($current_page == 'index.php' || $current_page == 'user_account.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -685,6 +690,12 @@
             </div>
         </div>
     </footer>
+
+    <button id="scrollToTopBtn" class="scroll-to-top" aria-label="Scroll to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="js/scrollup.js"></script>
 
     <script>
         // Animate stats counting

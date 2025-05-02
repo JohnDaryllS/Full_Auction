@@ -1,6 +1,10 @@
 <?php 
 include 'db_connect.php';
 
+// Get current page filename
+$current_page = basename($_SERVER['PHP_SELF']);
+$is_home = ($current_page == 'index.php' || $current_page == 'user_account.php');
+
 // Check if admin is viewing
 $is_admin_view = isset($_GET['admin']) && isset($_SESSION['admin_logged_in']);
 $can_bid = isset($_SESSION['user_id']) && !$is_admin_view;
@@ -684,6 +688,12 @@ $offset = ($page - 1) * $items_per_page;
             </div>
         </div>
     </footer>
+
+    <button id="scrollToTopBtn" class="scroll-to-top" aria-label="Scroll to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="js/scrollup.js"></script>
 
     <script>
         // Auto-refresh the page every minute to update timers
